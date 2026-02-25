@@ -283,12 +283,12 @@
     <div class="battle-area">
       <div class="hand-display">
         <div class="hand-label">あなた</div>
-        <div class="hand-emoji" id="player-hand">🤜</div>
+        <div class="hand-emoji" id="player-hand">🤜🏻</div>
       </div>
       <div class="vs-text">VS</div>
       <div class="hand-display">
         <div class="hand-label">コンピュータ</div>
-        <div class="hand-emoji" id="cpu-hand">🤜</div>
+        <div class="hand-emoji" id="cpu-hand">🤜🏻</div>
       </div>
     </div>
 
@@ -308,15 +308,15 @@
 
     <div class="choices">
       <button class="choice-btn" onclick="play('rock')">
-        <span class="emoji">✊</span>
+        <span class="emoji">✊🏻</span>
         <span class="name">グー</span>
       </button>
       <button class="choice-btn" onclick="play('scissors')">
-        <span class="emoji">✌️</span>
+        <span class="emoji">✌🏻</span>
         <span class="name">チョキ</span>
       </button>
       <button class="choice-btn" onclick="play('paper')">
-        <span class="emoji">🖐️</span>
+        <span class="emoji">🖐🏻</span>
         <span class="name">パー</span>
       </button>
     </div>
@@ -328,9 +328,9 @@
 
   <script>
     const HANDS = {
-      rock:    { emoji: '✊', name: 'グー' },
-      scissors:{ emoji: '✌️', name: 'チョキ' },
-      paper:   { emoji: '🖐️', name: 'パー' },
+      rock:    { emoji: '✊🏻', name: 'グー' },
+      scissors:{ emoji: '✌🏻', name: 'チョキ' },
+      paper:   { emoji: '🖐🏻', name: 'パー' },
     };
 
     // rock が scissors に勝つ、scissors が paper に勝つ、paper が rock に勝つ
@@ -441,8 +441,8 @@
       resetTimer = setTimeout(() => {
         resultEl.className = 'result-text';
         resultEl.textContent = '手を選んでください';
-        document.getElementById('player-hand').textContent = '🤜';
-        document.getElementById('cpu-hand').textContent    = '🤜';
+        document.getElementById('player-hand').textContent = '🤜🏻';
+        document.getElementById('cpu-hand').textContent    = '🤜🏻';
         document.getElementById('janken-call').style.visibility = 'visible';
         resetTimer = null;
         startCountdown();
@@ -456,8 +456,8 @@
       document.getElementById('win-count').textContent  = 0;
       document.getElementById('draw-count').textContent = 0;
       document.getElementById('lose-count').textContent = 0;
-      document.getElementById('player-hand').textContent = '🤜';
-      document.getElementById('cpu-hand').textContent    = '🤜';
+      document.getElementById('player-hand').textContent = '🤜🏻';
+      document.getElementById('cpu-hand').textContent    = '🤜🏻';
       const resultEl = document.getElementById('result-text');
       resultEl.className = 'result-text';
       resultEl.textContent = '手を選んでください';
