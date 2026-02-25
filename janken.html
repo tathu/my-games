@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>じゃんけんゲーム</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 90%;
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .score-board {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin: 20px 0;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 12px;
+    }
+
+    .score-item {
+      text-align: center;
+    }
+
+    .score-label {
+      font-size: 0.85rem;
+      color: #888;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .score-value {
+      font-size: 2rem;
+      font-weight: bold;
+    }
+
+    .score-item.win .score-value  { color: #28a745; }
+    .score-item.lose .score-value { color: #dc3545; }
+    .score-item.draw .score-value { color: #ffc107; }
+
+    .battle-area {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      margin: 25px 0;
+      min-height: 140px;
+    }
+
+    .hand-display {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hand-label {
+      font-size: 0.85rem;
+      color: #888;
+      font-weight: bold;
+    }
+
+    .hand-emoji {
+      font-size: 5rem;
+      transition: transform 0.3s ease;
+    }
+
+    .hand-emoji.shake {
+      animation: shake 0.5s ease infinite;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-10px); }
+    }
+
+    .vs-text {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #ccc;
+    }
+
+    .result-text {
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin: 10px 0;
+      min-height: 2.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .result-text.win  { color: #28a745; }
+    .result-text.lose { color: #dc3545; }
+    .result-text.draw { color: #ffc107; }
+
+    .choices {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .choice-btn {
+      background: none;
+      border: 3px solid #e0e0e0;
+      border-radius: 16px;
+      padding: 12px 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .choice-btn:hover {
+      border-color: #667eea;
+      background: #f0f0ff;
+      transform: translateY(-3px);
+    }
+
+    .choice-btn:active {
+      transform: translateY(0);
+    }
+
+    .choice-btn .emoji {
+      font-size: 2.5rem;
+    }
+
+    .choice-btn .name {
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #555;
+    }
+
+    .janken-call {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: #667eea;
+      margin-bottom: 5px;
+    }
+
+    .reset-btn {
+      margin-top: 15px;
+      padding: 10px 30px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background: #5a6fd6;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>✊ じゃんけんゲーム</h1>
+
+    <div class="score-board">
+      <div class="score-item win">
+        <div class="score-label">勝ち</div>
+        <div class="score-value" id="win-count">0</div>
+      </div>
+      <div class="score-item draw">
+        <div class="score-label">あいこ</div>
+        <div class="score-value" id="draw-count">0</div>
+      </div>
+      <div class="score-item lose">
+        <div class="score-label">負け</div>
+        <div class="score-value" id="lose-count">0</div>
+      </div>
+    </div>
+
+    <div class="battle-area">
+      <div class="hand-display">
+        <div class="hand-label">あなた</div>
+        <div class="hand-emoji" id="player-hand">🤜</div>
+      </div>
+      <div class="vs-text">VS</div>
+      <div class="hand-display">
+        <div class="hand-label">コンピュータ</div>
+        <div class="hand-emoji" id="cpu-hand">🤜</div>
+      </div>
+    </div>
+
+    <div class="result-text" id="result-text">手を選んでください</div>
+
+    <div class="janken-call" id="janken-call">じゃんけん！</div>
+
+    <div class="choices">
+      <button class="choice-btn" onclick="play('rock')">
+        <span class="emoji">✊</span>
+        <span class="name">グー</span>
+      </button>
+      <button class="choice-btn" onclick="play('scissors')">
+        <span class="emoji">✌️</span>
+        <span class="name">チョキ</span>
+      </button>
+      <button class="choice-btn" onclick="play('paper')">
+        <span class="emoji">🖐️</span>
+        <span class="name">パー</span>
+      </button>
+    </div>
+
+    <button class="reset-btn" onclick="resetScore()">スコアリセット</button>
+  </div>
+
+  <script>
+    const HANDS = {
+      rock:    { emoji: '✊', name: 'グー' },
+      scissors:{ emoji: '✌️', name: 'チョキ' },
+      paper:   { emoji: '🖐️', name: 'パー' },
+    };
+
+    // rock が scissors に勝つ、scissors が paper に勝つ、paper が rock に勝つ
+    const WINS_AGAINST = {
+      rock: 'scissors',
+      scissors: 'paper',
+      paper: 'rock',
+    };
+
+    const score = { win: 0, draw: 0, lose: 0 };
+
+    function getRandomHand() {
+      const keys = Object.keys(HANDS);
+      return keys[Math.floor(Math.random() * keys.length)];
+    }
+
+    function judge(player, cpu) {
+      if (player === cpu) return 'draw';
+      if (WINS_AGAINST[player] === cpu) return 'win';
+      return 'lose';
+    }
+
+    let resetTimer = null;
+
+    function play(playerChoice) {
+      // 連打時に前のタイマーをキャンセル
+      if (resetTimer) clearTimeout(resetTimer);
+
+      const cpuChoice = getRandomHand();
+      const result = judge(playerChoice, cpuChoice);
+
+      // 手を更新
+      document.getElementById('player-hand').textContent = HANDS[playerChoice].emoji;
+      document.getElementById('cpu-hand').textContent    = HANDS[cpuChoice].emoji;
+
+      // じゃんけん！を非表示
+      document.getElementById('janken-call').style.visibility = 'hidden';
+
+      // 結果を表示
+      const resultEl = document.getElementById('result-text');
+      resultEl.className = 'result-text';
+
+      if (result === 'win') {
+        resultEl.textContent = '🎉 あなたの勝ち！';
+        resultEl.classList.add('win');
+        score.win++;
+      } else if (result === 'lose') {
+        resultEl.textContent = '😢 あなたの負け…';
+        resultEl.classList.add('lose');
+        score.lose++;
+      } else {
+        resultEl.textContent = '🤝 あいこ！';
+        resultEl.classList.add('draw');
+        score.draw++;
+      }
+
+      // スコア更新
+      document.getElementById('win-count').textContent  = score.win;
+      document.getElementById('draw-count').textContent = score.draw;
+      document.getElementById('lose-count').textContent = score.lose;
+
+      // 3秒後にじゃんけん！を再表示・結果をリセット
+      resetTimer = setTimeout(() => {
+        resultEl.className = 'result-text';
+        resultEl.textContent = '手を選んでください';
+        document.getElementById('player-hand').textContent = '🤜';
+        document.getElementById('cpu-hand').textContent    = '🤜';
+        document.getElementById('janken-call').style.visibility = 'visible';
+        resetTimer = null;
+      }, 1000);
+    }
+
+    function resetScore() {
+      if (resetTimer) { clearTimeout(resetTimer); resetTimer = null; }
+      score.win = score.draw = score.lose = 0;
+      document.getElementById('win-count').textContent  = 0;
+      document.getElementById('draw-count').textContent = 0;
+      document.getElementById('lose-count').textContent = 0;
+      document.getElementById('player-hand').textContent = '🤜';
+      document.getElementById('cpu-hand').textContent    = '🤜';
+      const resultEl = document.getElementById('result-text');
+      resultEl.className = 'result-text';
+      resultEl.textContent = '手を選んでください';
+      document.getElementById('janken-call').style.visibility = 'visible';
+    }
+  </script>
+</body>
+</html>
