@@ -125,6 +125,19 @@
       background: rgba(245, 87, 108, 0.3);
       color: #ffa0b0;
     }
+
+    .card.memory {
+      border-color: rgba(67, 206, 162, 0.4);
+    }
+
+    .card.memory:hover {
+      box-shadow: 0 20px 40px rgba(67, 206, 162, 0.3);
+    }
+
+    .badge.memory {
+      background: rgba(67, 206, 162, 0.3);
+      color: #a0ffe0;
+    }
   </style>
 </head>
 <body>
@@ -145,6 +158,13 @@
         <div class="card-title">数当てゲーム</div>
         <div class="card-desc">1〜100の数字を<br>制限時間内に当てよう</div>
         <span class="badge number">タイムアタック</span>
+      </a>
+
+      <a class="card memory" href="memory.html">
+        <span class="card-icon">🃏</span>
+        <div class="card-title">神経衰弱</div>
+        <div class="card-desc">同じ絵柄のカードを<br>2枚そろえよう</div>
+        <span class="badge memory">記憶力勝負</span>
       </a>
     </div>
   </div>
