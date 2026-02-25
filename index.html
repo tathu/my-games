@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ゲームセンター</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .title {
+      font-size: 2.8rem;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 8px;
+      letter-spacing: 0.05em;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 60px;
+    }
+
+    .cards {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+      flex-wrap: wrap;
+      align-items: stretch;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 40px 36px;
+      width: 240px;
+      text-decoration: none;
+      transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      background: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .card-icon {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 10px;
+    }
+
+    .card.janken .card-title {
+      font-size: 1.05rem;
+    }
+
+    .card-desc {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.55);
+      line-height: 1.6;
+      flex: 1;
+    }
+
+    .card.janken {
+      border-color: rgba(102, 126, 234, 0.4);
+    }
+
+    .card.janken:hover {
+      box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+    }
+
+    .card.number {
+      border-color: rgba(245, 87, 108, 0.4);
+    }
+
+    .card.number:hover {
+      box-shadow: 0 20px 40px rgba(245, 87, 108, 0.3);
+    }
+
+    .badge {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    .badge.janken {
+      background: rgba(102, 126, 234, 0.3);
+      color: #a0b0ff;
+    }
+
+    .badge.number {
+      background: rgba(245, 87, 108, 0.3);
+      color: #ffa0b0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="title">🎮 ゲームセンター</div>
+    <p class="subtitle">遊びたいゲームを選んでください</p>
+
+    <div class="cards">
+      <a class="card janken" href="janken.html">
+        <span class="card-icon">✊</span>
+        <div class="card-title">じゃんけんゲーム</div>
+        <div class="card-desc">グー・チョキ・パーで<br>コンピュータと対戦しよう</div>
+        <span class="badge janken">1人プレイ</span>
+      </a>
+
+      <a class="card number" href="number_guess.html">
+        <span class="card-icon">🔢</span>
+        <div class="card-title">数当てゲーム</div>
+        <div class="card-desc">1〜100の数字を<br>5秒以内に当てよう</div>
+        <span class="badge number">タイムアタック</span>
+      </a>
+    </div>
+  </div>
+</body>
+</html>

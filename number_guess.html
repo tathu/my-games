@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数当てゲーム</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 460px;
+      width: 90%;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      color: #333;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: #999;
+      margin-bottom: 24px;
+    }
+
+    .hint-box {
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8f9fa;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      padding: 12px 20px;
+    }
+
+    .hint-text {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #555;
+    }
+
+    .hint-text.high  { color: #f5576c; }
+    .hint-text.low   { color: #4facfe; }
+    .hint-text.win   { color: #43e97b; }
+
+    .range-bar {
+      position: relative;
+      height: 10px;
+      background: #e9ecef;
+      border-radius: 10px;
+      margin: 0 0 24px;
+      overflow: visible;
+    }
+
+    .range-fill {
+      position: absolute;
+      height: 100%;
+      background: linear-gradient(90deg, #f093fb, #f5576c);
+      border-radius: 10px;
+      transition: all 0.4s ease;
+    }
+
+    .range-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #aaa;
+      margin-bottom: 20px;
+      margin-top: -16px;
+    }
+
+    .input-area {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .guess-input {
+      flex: 1;
+      padding: 14px 16px;
+      font-size: 1.4rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      text-align: center;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .guess-input:focus {
+      border-color: #f5576c;
+    }
+
+    .guess-input:disabled {
+      background: #f8f9fa;
+      color: #aaa;
+    }
+
+    .guess-btn {
+      padding: 14px 24px;
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    .guess-btn:hover:not(:disabled) {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .guess-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .history {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      min-height: 36px;
+      margin-bottom: 20px;
+    }
+
+    .history-tag {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    .history-tag.high {
+      background: #ffe0e4;
+      color: #f5576c;
+    }
+
+    .history-tag.low {
+      background: #dff0ff;
+      color: #4facfe;
+    }
+
+    .history-tag.win {
+      background: #d4f8e4;
+      color: #28a745;
+    }
+
+    .try-count {
+      font-size: 0.9rem;
+      color: #aaa;
+      margin-bottom: 16px;
+    }
+
+    .try-count span {
+      font-weight: bold;
+      color: #f5576c;
+      font-size: 1.1rem;
+    }
+
+    .countdown-area {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .countdown-ring {
+      position: relative;
+      width: 64px;
+      height: 64px;
+    }
+
+    .countdown-ring svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .ring-bg {
+      fill: none;
+      stroke: #e9ecef;
+      stroke-width: 5;
+    }
+
+    .ring-fill {
+      fill: none;
+      stroke: #f5576c;
+      stroke-width: 5;
+      stroke-linecap: round;
+      stroke-dasharray: 163.4;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 1s linear, stroke 0.3s;
+    }
+
+    .ring-fill.danger {
+      stroke: #f5576c;
+    }
+
+    .countdown-num {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #f5576c;
+      transition: color 0.3s;
+    }
+
+    .countdown-num.danger {
+      color: #f5576c;
+      animation: pulse 0.5s ease infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { transform: scale(1); }
+      to   { transform: scale(1.2); }
+    }
+
+    .reset-btn {
+      padding: 10px 30px;
+      background: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .reset-btn:hover {
+      background: #5a6268;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔢 数当てゲーム</h1>
+    <p class="subtitle">1〜100の数字を当ててください</p>
+
+    <div class="hint-box">
+      <div class="hint-text" id="hint-text">数字を入力してください</div>
+    </div>
+
+    <div class="range-bar">
+      <div class="range-fill" id="range-fill" style="left:0%; width:100%;"></div>
+    </div>
+    <div class="range-labels">
+      <span id="range-min">1</span>
+      <span id="range-max">100</span>
+    </div>
+
+    <div class="countdown-area">
+      <div class="countdown-ring">
+        <svg viewBox="0 0 60 60">
+          <circle cx="30" cy="30" r="26" class="ring-bg" />
+          <circle cx="30" cy="30" r="26" class="ring-fill" id="ring-fill" />
+        </svg>
+        <div class="countdown-num" id="countdown-num">5</div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <input type="number" class="guess-input" id="guess-input"
+             min="1" max="100" placeholder="?" />
+      <button class="guess-btn" id="guess-btn" onclick="guess()">決定</button>
+    </div>
+
+    <div class="try-count">挑戦回数：<span id="try-count">0</span> 回</div>
+
+    <div class="history" id="history"></div>
+
+    <button class="reset-btn" onclick="resetGame()">最初からやり直す</button>
+  </div>
+
+  <script>
+    let answer;
+    let tries;
+    let rangeMin;
+    let rangeMax;
+    let gameOver;
+    let countdownVal;
+    let countdownTimer;
+
+    const TOTAL_TIME   = 5;
+    const CIRCUMFERENCE = 2 * Math.PI * 26; // ≈ 163.4
+
+    function initGame() {
+      answer   = Math.floor(Math.random() * 100) + 1;
+      tries    = 0;
+      rangeMin = 1;
+      rangeMax = 100;
+      gameOver = false;
+
+      document.getElementById('hint-text').textContent = '数字を入力してください';
+      document.getElementById('hint-text').className   = 'hint-text';
+      document.getElementById('try-count').textContent = 0;
+      document.getElementById('history').innerHTML     = '';
+      document.getElementById('guess-input').value     = '';
+      document.getElementById('guess-input').disabled  = false;
+      document.getElementById('guess-btn').disabled    = false;
+      document.getElementById('guess-input').focus();
+      updateRangeBar();
+      updateRangeLabels();
+      startCountdown();
+    }
+
+    function startCountdown() {
+      if (countdownTimer) clearInterval(countdownTimer);
+      countdownVal = TOTAL_TIME;
+      updateCountdownUI();
+      countdownTimer = setInterval(() => {
+        countdownVal--;
+        updateCountdownUI();
+        if (countdownVal <= 0) {
+          clearInterval(countdownTimer);
+          timeUp();
+        }
+      }, 1000);
+    }
+
+    function updateCountdownUI() {
+      const numEl  = document.getElementById('countdown-num');
+      const ringEl = document.getElementById('ring-fill');
+      const offset = CIRCUMFERENCE * (1 - countdownVal / TOTAL_TIME);
+      ringEl.style.strokeDashoffset = offset;
+      numEl.textContent = countdownVal;
+
+      if (countdownVal <= 2) {
+        numEl.classList.add('danger');
+        ringEl.classList.add('danger');
+      } else {
+        numEl.classList.remove('danger');
+        ringEl.classList.remove('danger');
+      }
+    }
+
+    function timeUp() {
+      if (gameOver) return;
+      gameOver = true;
+      document.getElementById('guess-input').disabled = true;
+      document.getElementById('guess-btn').disabled   = true;
+      const hintEl = document.getElementById('hint-text');
+      hintEl.textContent = `⏰ 時間切れ！答えは ${answer} でした`;
+      hintEl.className   = 'hint-text high';
+    }
+
+    function updateRangeBar() {
+      const fill = document.getElementById('range-fill');
+      const left  = ((rangeMin - 1) / 100) * 100;
+      const width = ((rangeMax - rangeMin + 1) / 100) * 100;
+      fill.style.left  = left + '%';
+      fill.style.width = width + '%';
+    }
+
+    function updateRangeLabels() {
+      document.getElementById('range-min').textContent = rangeMin;
+      document.getElementById('range-max').textContent = rangeMax;
+    }
+
+    function addHistory(num, type) {
+      const tag = document.createElement('span');
+      tag.className   = 'history-tag ' + type;
+      tag.textContent = num;
+      document.getElementById('history').appendChild(tag);
+    }
+
+    function guess() {
+      if (gameOver) return;
+
+      const input = document.getElementById('guess-input');
+      const num   = parseInt(input.value, 10);
+
+      if (isNaN(num) || num < 1 || num > 100) {
+        document.getElementById('hint-text').textContent = '1〜100の数字を入力してください';
+        document.getElementById('hint-text').className   = 'hint-text';
+        input.focus();
+        return;
+      }
+
+      tries++;
+      document.getElementById('try-count').textContent = tries;
+      input.value = '';
+
+      const hintEl = document.getElementById('hint-text');
+
+      if (num === answer) {
+        clearInterval(countdownTimer);
+        hintEl.textContent = `🎉 正解！ ${tries} 回で当たりました！`;
+        hintEl.className   = 'hint-text win';
+        addHistory(num, 'win');
+        document.getElementById('guess-input').disabled = true;
+        document.getElementById('guess-btn').disabled   = true;
+        gameOver = true;
+      } else if (num > answer) {
+        hintEl.textContent = `📉 ${num} より小さい`;
+        hintEl.className   = 'hint-text high';
+        addHistory(num, 'high');
+        if (num < rangeMax) { rangeMax = num - 1; }
+        updateRangeBar();
+        updateRangeLabels();
+        startCountdown();
+        input.focus();
+      } else {
+        hintEl.textContent = `📈 ${num} より大きい`;
+        hintEl.className   = 'hint-text low';
+        addHistory(num, 'low');
+        if (num > rangeMin) { rangeMin = num + 1; }
+        updateRangeBar();
+        updateRangeLabels();
+        startCountdown();
+        input.focus();
+      }
+    }
+
+    function resetGame() {
+      if (countdownTimer) clearInterval(countdownTimer);
+      initGame();
+    }
+
+    // Enterキーで決定
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') guess();
+    });
+
+    initGame();
+  </script>
+</body>
+</html>
