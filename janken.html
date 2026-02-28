@@ -283,12 +283,12 @@
     <div class="battle-area">
       <div class="hand-display">
         <div class="hand-label">あなた</div>
-        <div class="hand-emoji" id="player-hand">🤜🏻</div>
+        <div class="hand-emoji" id="player-hand">👧</div>
       </div>
       <div class="vs-text">VS</div>
       <div class="hand-display">
         <div class="hand-label">コンピュータ</div>
-        <div class="hand-emoji" id="cpu-hand">🤜🏻</div>
+        <div class="hand-emoji" id="cpu-hand">🤖</div>
       </div>
     </div>
 
@@ -327,6 +327,47 @@
   </div>
 
   <script>
+    // --- 効果音（Web Audio API） ---
+    let audioCtx = null;
+
+    function playSound(type) {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const ctx = audioCtx;
+      const t = ctx.currentTime + 0.05;
+
+      if (type === 'win') {
+        [523, 659, 784, 1047].forEach((freq, i) => {
+          const osc = ctx.createOscillator(), gain = ctx.createGain();
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, t + i * 0.12);
+          gain.gain.setValueAtTime(0.3, t + i * 0.12);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.12 + 0.25);
+          osc.start(t + i * 0.12); osc.stop(t + i * 0.12 + 0.25);
+        });
+      } else if (type === 'lose') {
+        [392, 330, 294, 220].forEach((freq, i) => {
+          const osc = ctx.createOscillator(), gain = ctx.createGain();
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(freq, t + i * 0.15);
+          gain.gain.setValueAtTime(0.2, t + i * 0.15);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.15 + 0.3);
+          osc.start(t + i * 0.15); osc.stop(t + i * 0.15 + 0.3);
+        });
+      } else if (type === 'draw') {
+        [440, 440].forEach((freq, i) => {
+          const osc = ctx.createOscillator(), gain = ctx.createGain();
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, t + i * 0.2);
+          gain.gain.setValueAtTime(0.25, t + i * 0.2);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.2 + 0.3);
+          osc.start(t + i * 0.2); osc.stop(t + i * 0.2 + 0.3);
+        });
+      }
+    }
+
     const HANDS = {
       rock:    { emoji: '✊🏻', name: 'グー' },
       scissors:{ emoji: '✌🏻', name: 'チョキ' },
@@ -423,14 +464,17 @@
         resultEl.textContent = '🎉 あなたの勝ち！';
         resultEl.classList.add('win');
         score.win++;
+        playSound('win');
       } else if (result === 'lose') {
         resultEl.textContent = '😢 あなたの負け…';
         resultEl.classList.add('lose');
         score.lose++;
+        playSound('lose');
       } else {
         resultEl.textContent = '🤝 あいこ！';
         resultEl.classList.add('draw');
         score.draw++;
+        playSound('draw');
       }
 
       document.getElementById('win-count').textContent  = score.win;
@@ -441,8 +485,8 @@
       resetTimer = setTimeout(() => {
         resultEl.className = 'result-text';
         resultEl.textContent = '手を選んでください';
-        document.getElementById('player-hand').textContent = '🤜🏻';
-        document.getElementById('cpu-hand').textContent    = '🤜🏻';
+        document.getElementById('player-hand').textContent = '👧';
+        document.getElementById('cpu-hand').textContent    = '🤖';
         document.getElementById('janken-call').style.visibility = 'visible';
         resetTimer = null;
         startCountdown();
@@ -456,8 +500,8 @@
       document.getElementById('win-count').textContent  = 0;
       document.getElementById('draw-count').textContent = 0;
       document.getElementById('lose-count').textContent = 0;
-      document.getElementById('player-hand').textContent = '🤜🏻';
-      document.getElementById('cpu-hand').textContent    = '🤜🏻';
+      document.getElementById('player-hand').textContent = '👧';
+      document.getElementById('cpu-hand').textContent    = '🤖';
       const resultEl = document.getElementById('result-text');
       resultEl.className = 'result-text';
       resultEl.textContent = '手を選んでください';
